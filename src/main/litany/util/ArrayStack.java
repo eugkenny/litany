@@ -18,7 +18,7 @@ public class ArrayStack<E> implements Stack<E> {
 	@Override
 	public void push(E element) {
 		if (size == stack.length) {
-			resize(size * 2);
+			resize(size * 2);		// Growth strategy?
 		}
 		stack[size] = element;
 		size++;
@@ -99,10 +99,6 @@ public class ArrayStack<E> implements Stack<E> {
             return i >= 0;
         }
 
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
         public E next() {
             if (!hasNext()) throw new NoSuchElementException();
             
@@ -110,6 +106,10 @@ public class ArrayStack<E> implements Stack<E> {
             i--;
             
             return e;
+        }
+        
+        public void remove() {
+            throw new UnsupportedOperationException();
         }
     }
 }
