@@ -6,17 +6,17 @@ import java.util.NoSuchElementException;
 public class LinkedStack<E> implements Stack<E>{
 	
 	private int size;
-	private Node<E> first;
+	private Node<E> top;
 	
 	public LinkedStack(){
-		first = null;
+		top = null;
 		size = 0;
 	}
 
 	@Override
 	public void push(E element) {
-		Node<E> temp = first;
-		first = new Node<E>(element, temp);
+		Node<E> temp = top;
+		top = new Node<E>(element, temp);
 		size++;
 	}
 
@@ -25,8 +25,8 @@ public class LinkedStack<E> implements Stack<E>{
 		if (isEmpty()) {
 			throw new NoSuchElementException("Stack empty");
 		}
-		E element = first.element;
-		first = first.next;
+		E element = top.element;
+		top = top.next;
 		size--;
 		
 		return element;
@@ -37,7 +37,7 @@ public class LinkedStack<E> implements Stack<E>{
 		if (isEmpty()) {
 			throw new NoSuchElementException("Stack empty");
 		}
-		return first.element;
+		return top.element;
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class LinkedStack<E> implements Stack<E>{
 		private Node<E> current;
 		
 		public StackIterator() {
-			current = first;
+			current = top;
 		}
 
 		@Override
