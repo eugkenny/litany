@@ -73,7 +73,6 @@ public class LinkedStack<E> implements Stack<E>{
 		return new StackIterator();
 	}
 
-	
 	private static class Node<E>{
 		E element;
 		Node<E> next;
