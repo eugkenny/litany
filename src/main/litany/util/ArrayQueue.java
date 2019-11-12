@@ -55,7 +55,6 @@ public class ArrayQueue<E> implements Queue<E> {
 		}
 		
 		return queue[front];
-
 	}
 
 	@Override
