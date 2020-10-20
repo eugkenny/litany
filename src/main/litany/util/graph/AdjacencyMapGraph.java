@@ -1,12 +1,12 @@
 package litany.util.graph;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class AdjacencyMapGraph<V,E> implements Graph<V,E> {
 
-    protected Map<V, Map<V,E>> adj;
+    protected Map<V, Map<V,E>> out;
+    protected Map<V, Map<V,E>> in;
+
     protected boolean directed;
 
     public AdjacencyMapGraph(){
@@ -14,23 +14,21 @@ public class AdjacencyMapGraph<V,E> implements Graph<V,E> {
     }
 
     public AdjacencyMapGraph(boolean directed){
-        adj = new HashMap<>();
+        out = new HashMap<>();
+        in = new HashMap<>();
         this.directed = directed;
     }
 
     @Override
     public int order() {
-        return adj.keySet().size();
+        return out.keySet().size();
     }
 
     @Override
     public int size() {
         int edges = 0;
-        for(V v : adj.keySet()) {
+        for(V v : out.keySet()) {
             edges += degree(v);
-        }
-        if(!directed){
-            edges /= 2;
         }
         return edges;
     }
@@ -38,7 +36,8 @@ public class AdjacencyMapGraph<V,E> implements Graph<V,E> {
     @Override
     public void addVertex(V v) {
         if(!hasVertex(v)){
-            adj.put(v, new HashMap<>());
+            out.put(v, new HashMap<>());
+            in.put(v, new HashMap<>());
         }
     }
 
@@ -47,46 +46,64 @@ public class AdjacencyMapGraph<V,E> implements Graph<V,E> {
         if(!hasVertex(v))
             return;
         for(V u : neighbours(v)){
-            adj.get(u).remove(v);
+            out.get(u).remove(v);
+            in.get(u).remove(v);
         }
-        adj.remove(v);
+        out.remove(v);
+        in.remove(v);
     }
 
     @Override
     public boolean hasVertex(V v) {
-        return adj.containsKey(v);
+        return out.containsKey(v);
     }
 
+    @Override
     public int degree(V v){
-        return adj.get(v).size();
+        return out.get(v).size();
     }
 
     public Iterable<V> neighbours(V v){
-        return adj.get(v).keySet();
+        if(directed)
+            return out.get(v).keySet();
+        else{
+            Set<V> neighbours = new HashSet<>(out.get(v).keySet());
+            neighbours.addAll(in.get(v).keySet());
+            return neighbours;
+        }
     }
 
     @Override
     public void addEdge(V u, V v, E e) {
-        if (adj.get(u) == null){
+        if (out.get(u) == null){
             addVertex(u);
         }
-        if(adj.get(v) == null){
+        if(out.get(v) == null){
             addVertex(v);
         }
 
-        adj.get(u).put(v, e);
-        if (!directed) {
-            adj.get(v).put(u, e);
-        }
+        out.get(u).put(v, e);
+        in.get(v).put(u, e);
     }
 
     public boolean hasEdge(V u, V v){
-        return adj.get(u).containsKey(v);
+        return out.get(u).containsKey(v) || in.get(u).containsKey(v);
+    }
+
+    public E getEdge(V u, V v){
+        if (directed)
+            return out.get(u).get(v);
+        else{
+            if(out.get(u).get(v) != null)
+                return out.get(u).get(v);
+            else
+                return in.get(u).get(v);
+        }
     }
 
     @Override
     public Iterator<V> iterator() {
-        return adj.keySet().iterator();
+        return out.keySet().iterator();
     }
 
     public String toString(){
@@ -100,8 +117,14 @@ public class AdjacencyMapGraph<V,E> implements Graph<V,E> {
 
         sb.append("Edges: {");
         for(V v : this){
-            for(V u : adj.get(v).keySet()){
-                sb.append("(").append(v).append(", ").append(u).append(", ").append(adj.get(v).get(u)).append(")").append(", ");
+            for(V u : out.get(v).keySet()) {
+                sb.append("(").append(v);
+                if (directed)
+                    sb.append(" -> ");
+                else
+                    sb.append(" - ");
+
+                sb.append(u).append(", ").append(out.get(v).get(u)).append(")").append(", ");
             }
         }
         sb.delete(sb.length() - 2, sb.length());
@@ -121,6 +144,7 @@ public class AdjacencyMapGraph<V,E> implements Graph<V,E> {
 
         System.out.println(g);
         System.out.println("Adjacent: 2, 4 - "  + g.hasEdge(2,4));
+        System.out.println("Adjacent: 4, 2 - "  + g.hasEdge(4,2));
         System.out.println("Adjacent: 3, 4 - "  + g.hasEdge(3,4));
 
         System.out.print("Neighbours: 2 - ");

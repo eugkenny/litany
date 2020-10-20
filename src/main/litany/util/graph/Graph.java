@@ -39,5 +39,9 @@ public interface Graph<V,E> extends Iterable<V>{
 
     boolean hasEdge(V u, V v);
 
+    E getEdge(V u, V v);
+
+    int degree(V v);
+
     Iterable<V> neighbours(V v);
 }
